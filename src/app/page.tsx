@@ -76,5 +76,4 @@ export default function Home() {
 }
 
 // TODO:
-//git push
 //rest of the stuff in confluence
