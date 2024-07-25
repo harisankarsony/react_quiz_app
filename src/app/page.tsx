@@ -1,56 +1,67 @@
 "use client"
 
-import React, { ChangeEvent, useState } from "react";
+import React, { ChangeEvent, useEffect } from "react";
 import { Question } from "./components/QuestionComponent";
 import { questions } from "./questions";
 import { Results } from "./components/Results";
-import { BUTTON_NAME_NEXT, BUTTON_NAME_PREVIOUS, BUTTON_NAME_RESTART, BUTTON_TEXT_NEXT, BUTTON_TEXT_PREVIOUS, BUTTON_TEXT_RESTART, BUTTON_TEXT_SUBMIT } from "./constants";
+import { BUTTON_NAME_NEXT, BUTTON_NAME_RESTART, BUTTON_TEXT_NEXT, BUTTON_TEXT_RESTART, BUTTON_TEXT_SUBMIT } from "./constants";
+import { useReactiveVar } from "@apollo/client";
+import { buttonTextVar, currentQuestionVar, selectedAnswersVar, showResultVar, timeLeftVar } from "./reactive_variable";
 
 export default function Home() {
-  const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [selectedAnswers, setSelectedAnswers] = useState(Object);
-  const [buttonText, setButtonText] = useState(BUTTON_TEXT_NEXT);
-  const [showResult, setShowResult] = useState(false);
+  const currentQuestion = useReactiveVar(currentQuestionVar);
+  const showResult = useReactiveVar(showResultVar);
+  const selectedAnswers = useReactiveVar(selectedAnswersVar);
+  const buttonText = useReactiveVar(buttonTextVar);
+  const timeLeft = useReactiveVar(timeLeftVar)
+
+  useEffect(() => {
+    if (timeLeft === 0) {
+      changeQuestion(BUTTON_NAME_NEXT);
+    }
+    const timer = setInterval(() => {
+      timeLeftVar(timeLeft > 0 ? timeLeft - 1 : 0);
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [timeLeft]);
+
+  useEffect(() => {
+    timeLeftVar(10);
+  }, [currentQuestion]);
 
   function changeQuestion(buttonName: string) {
-    if (buttonName === BUTTON_NAME_PREVIOUS) {
-      setCurrentQuestion((currentQuestion) => currentQuestion - 1);
-      setButtonText(BUTTON_TEXT_NEXT);
-    }
-
     if (buttonName === BUTTON_NAME_NEXT) {
       if (currentQuestion == questions.length - 1)
-        setShowResult(true);
+        showResultVar(true);
       else {
         if (currentQuestion === questions.length - 2) {
-          setButtonText(BUTTON_TEXT_SUBMIT);
+          buttonTextVar(BUTTON_TEXT_SUBMIT);
         }
-        setCurrentQuestion((currentQuestion) => currentQuestion + 1);
+        currentQuestionVar(currentQuestion + 1);
       }
     }
-
     if (buttonName === BUTTON_NAME_RESTART) {
-      setCurrentQuestion(0);
-      setSelectedAnswers({});
-      setButtonText(BUTTON_TEXT_NEXT);
-      setShowResult(false);
+      currentQuestionVar(0);
+      selectedAnswersVar([]);
+      buttonTextVar(BUTTON_TEXT_NEXT);
+      showResultVar(false);
     }
   }
 
   function handleInputChange(e: ChangeEvent<HTMLInputElement>) {
-    setSelectedAnswers({ ...selectedAnswers, [currentQuestion]: e.target.value })
+    selectedAnswersVar([...selectedAnswers, e.target.value])
   }
 
   function calculateResult() {
-    let calculatedResult = 0
-    for (let i = 0; i < questions.length; i++) {
-      if (selectedAnswers[i] === questions[i].correctAnswer) {
+    let calculatedResult = 0;
+
+    for (const element in questions) {
+      if (selectedAnswers[element] === questions[element].correctAnswer) {
         calculatedResult++;
       }
     }
     return calculatedResult;
   }
-
 
   return (
     <div className="flex items-center justify-center min-h-screen">
@@ -64,8 +75,8 @@ export default function Home() {
             </div> :
             <>
               <Question question={questions[currentQuestion]} onInputChange={handleInputChange} selected={selectedAnswers[currentQuestion]} />
-              <div className="flex justify-center space-x-4 mt-4">
-                {currentQuestion !== 0 && <button className="bg-gray-200 hover:bg-gray-400 text-black font-bold py-2 px-4 rounded disabled:opacity-60" onClick={() => changeQuestion(BUTTON_NAME_PREVIOUS)} >{BUTTON_TEXT_PREVIOUS}</button>}
+              <div className="flex justify-center items-center space-x-4 mt-4">
+                <p>Time left: <label className="time-left font-semibold" style={timeLeft > 5 ? { color: "green" } : { color: "red" }}>{timeLeft} seconds</label></p>
                 <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:opacity-60" onClick={() => changeQuestion(BUTTON_NAME_NEXT)} disabled={!(currentQuestion in selectedAnswers)}>{buttonText}</button>
               </div>
             </>}
