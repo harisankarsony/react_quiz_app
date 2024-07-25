@@ -74,6 +74,3 @@ export default function Home() {
     </div>
   );
 }
-
-// TODO:
-//rest of the stuff in confluence
