@@ -3,7 +3,7 @@
 import React, { ChangeEvent, useEffect, useRef } from "react";
 import { Question } from "./components/QuestionComponent";
 import { Results } from "./components/Results";
-import { BUTTON_NAME_NEXT, BUTTON_NAME_RESTART, BUTTON_TEXT_NEXT, BUTTON_TEXT_RESTART, BUTTON_TEXT_SUBMIT, quizApi } from "./constants";
+import { BUTTON_NAME_NEXT, BUTTON_NAME_RESTART, BUTTON_TEXT_NEXT, BUTTON_TEXT_RESTART, BUTTON_TEXT_SUBMIT, quizApi, STATUS_LOADED, STATUS_LOADING } from "./constants";
 import { useReactiveVar } from "@apollo/client";
 import { buttonTextVar, currentQuestionVar, selectedAnswersVar, showResultVar, timeLeftVar, questionsVar, loadingStatusVar } from "./reactive_variable";
 import axios from "axios";
@@ -53,6 +53,7 @@ export default function Home() {
   }
 
   function getCorrectAnswer(answers: any, correct_answers: any) {
+
     for (const key in correct_answers) {
       if (correct_answers[key] === "true") {
         const answerKey = key.replace('_correct', '');
@@ -63,10 +64,10 @@ export default function Home() {
   }
 
   async function fetchQuestions() {
-    loadingStatusVar("loading");
+    loadingStatusVar(STATUS_LOADING);
     const response = await axios.get(quizApi);
     questionsVar(response.data);
-    loadingStatusVar("loaded");
+    loadingStatusVar(STATUS_LOADED);
   }
 
   useEffect(() => {
@@ -101,7 +102,7 @@ export default function Home() {
               <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:opacity-60 my-2" onClick={() => changeQuestion(BUTTON_NAME_RESTART)} >{BUTTON_TEXT_RESTART}</button>
             </div> :
             <>
-              {loadingStatus === "loaded" ?
+              {loadingStatus === STATUS_LOADED ?
                 <>
                   <Question question={questions[currentQuestion]} onInputChange={handleInputChange} id={currentQuestion + 1} totalQuestions={questions.length} />
                   <div className="flex justify-center items-center space-x-4 mt-4">
