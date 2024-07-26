@@ -9,6 +9,8 @@ export const Results: React.FC<Results> = ({ result, totalQuestions }) => {
 
     function getEmote() {
         let emote: string;
+        console.log(result);
+
 
         if (result < (totalQuestions / 2)) {
             emote = FAIL_EMOTE;
