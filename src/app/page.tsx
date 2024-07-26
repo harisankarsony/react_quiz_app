@@ -103,7 +103,7 @@ export default function Home() {
             <>
               {loadingStatus === "loaded" ?
                 <>
-                  <Question question={questions[currentQuestion]} onInputChange={handleInputChange} selected={selectedAnswers[currentQuestion]} id={currentQuestion + 1} />
+                  <Question question={questions[currentQuestion]} onInputChange={handleInputChange} id={currentQuestion + 1} totalQuestions={questions.length} />
                   <div className="flex justify-center items-center space-x-4 mt-4">
                     <p>Time left: <label className="time-left font-semibold" style={timeLeft > 5 ? { color: "green" } : { color: "red" }}>{timeLeft} seconds</label></p>
                     <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:opacity-60" onClick={() => changeQuestion(BUTTON_NAME_NEXT)} disabled={!(currentQuestion in selectedAnswers)}>{buttonText}</button>
