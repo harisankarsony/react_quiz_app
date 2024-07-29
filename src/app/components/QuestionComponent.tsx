@@ -1,14 +1,12 @@
 import { ChangeEvent } from "react";
 
 type Question = {
-    id: string;
     question: string;
-    answers: Array<string>;
-    correctAnswer: string;
-};
+    answers: { [key: string]: string };
+}
 
 type QuestionComponent = {
-    question: any;
+    question: Question;
     id: number;
     onInputChange: (e: ChangeEvent<HTMLInputElement>) => void;
     totalQuestions: number;

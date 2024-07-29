@@ -41,27 +41,33 @@ export default function Home() {
     selectedAnswersVar([...selectedAnswers, e.target.value])
   }
 
-  function calculateResult() {
+  type AnswerKey = 'answer_a' | 'answer_b' | 'answer_c' | 'answer_d' | 'answer_e' | 'answer_f';
+  type Answers = Record<AnswerKey, string | null>;
+  type CorrectAnswers = Record<AnswerKey, string>;
+
+  function calculateResult(): number {
     let calculatedResult = 0;
 
     for (const element in selectedAnswers) {
-      if (selectedAnswers[element] === getCorrectAnswer(questions[element].answers, questions[element].correct_answers)) {
-        calculatedResult++;
+      if (questions[element]) {
+        if (selectedAnswers[element] === getCorrectAnswer(questions[element].answers, questions[element].correct_answers)) {
+          calculatedResult++;
+        }
       }
     }
     return calculatedResult;
   }
 
-  function getCorrectAnswer(answers: any, correct_answers: any) {
-
+  function getCorrectAnswer(answers: Answers, correct_answers: CorrectAnswers): string | null {
     for (const key in correct_answers) {
-      if (correct_answers[key] === "true") {
-        const answerKey = key.replace('_correct', '');
+      if (correct_answers[key as AnswerKey] === "true") {
+        const answerKey = key.replace('_correct', '') as AnswerKey;
         return answers[answerKey];
       }
     }
     return null;
   }
+
 
   async function fetchQuestions() {
     loadingStatusVar(STATUS_LOADING);
