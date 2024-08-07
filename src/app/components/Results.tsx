@@ -24,7 +24,7 @@ export const Results: React.FC<Results> = ({ result, totalQuestions }) => {
     return (
         <>
             <h1 className="text-blue-700 font-semibold">Your Score is {result}/{totalQuestions} {getEmote()}</h1>
-            <Form result={result} totalQuestions={totalQuestions} />
+            <Form />
         </>
     )
 }
